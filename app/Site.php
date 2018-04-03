@@ -10,4 +10,8 @@ class Site extends Model
       'url',
       'name'
     ];
+
+    public function links(){
+        return $this->hasMany(SiteLink::class);
+    }
 }

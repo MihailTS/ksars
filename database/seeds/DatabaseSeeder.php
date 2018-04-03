@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         $sites=['google.com','yandex.ru','mail.ru', 'adizes.me'];
 
         Site::truncate();
