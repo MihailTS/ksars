@@ -13,7 +13,12 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         DB::statement('SET FOREIGN_KEY_CHECKS = 0');
-        $sites=['google.com','yandex.ru','mail.ru', 'adizes.me'];
+        $sites=[
+            'https://adizes.me/',
+            'https://google.com/',
+            'https://yandex.ru/',
+            'https://mail.ru/'
+        ];
 
         Site::truncate();
 
