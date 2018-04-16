@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Site extends Model
@@ -14,15 +15,22 @@ class Site extends Model
     {
         if($this->links->count()===0){//ссылки для сайта еще не обрабатывались
             $siteMainLink=SiteLink::createLink($this->url,$this->url,$this);
-            $siteMainLink->parseLinks();
+            if($siteMainLink){
+                $siteMainLink->parseLinks();
+            }
         }else{
             foreach($this->links as $link){
                 $link->parseLinks();
+                //var_dump($link->url);
+
             }
         }
     }
 
     public function links(){
-        return $this->hasMany(SiteLink::class);
+        return $this->hasMany(SiteLink::class)
+            ->whereNull('status')
+            ->orWhere('status','!=',200)
+            ->orWhere('updated_at','<', Carbon::yesterday());
     }
 }

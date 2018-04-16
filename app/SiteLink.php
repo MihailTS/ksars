@@ -18,14 +18,21 @@ class SiteLink extends Model
         'site_id'
     ];
 
-    public static function validateUrl(String $url, String $domain)
+    public static function validateUrl(String $url, String $siteUrl)
     {
-        /*if(preg_match('/^(tel|javascript|mailto)/', $url)===false){
-            if(preg_match('/^(http|https):\/\//', $url)){
-
+        if(SiteLink::isURLBelongsToSiteDomain($url,$siteUrl)){
+            //if(!preg_match('/^(#|\\\'|\/|tel|javascript|mailto)/i', $url)){
+            if(
+                $url!='/' &&
+                !preg_match('/^(\'|#|tel|javascript|mailto)/i', $url)
+            ){
+                $siteLinkDublicate=SiteLink::where("url",$url)->first();
+                if(!$siteLinkDublicate){
+                    return $url;
+                }
             }
-        }*/
-        return $url;
+        }
+        return false;
     }
     public static function createLink(String $url, String $baseURI, Site $site, Integer $status=null)
     {
@@ -37,9 +44,29 @@ class SiteLink extends Model
             $siteLink->site_id = $site->id;
             $siteLink->status = $status;
             $siteLink->save();
+            return $siteLink;
         }
 
-        return $siteLink;
+    }
+
+    /**
+     * Возвращает принадлежит ли ссылка домену данного сайта
+     * @param $url
+     * @param $siteUrl
+     * @return bool
+     */
+    private static function isURLBelongsToSiteDomain($url, $siteUrl){
+        $domainHost = parse_url($siteUrl,PHP_URL_HOST);
+        $urlHost = parse_url($url,PHP_URL_HOST);
+        if(!$urlHost){//относительная ссылка
+            return true;
+        }else{
+            var_dump($urlHost.":".$domainHost.
+                "(".(substr($urlHost, -strlen($domainHost)) === $domainHost).")");
+            //return true;
+            return (substr($urlHost, -strlen($domainHost)) === $domainHost);
+            //return true;//(substr($urlHost, 0, strlen($domainHost)) === $domainHost);
+        }
     }
 
     /**
@@ -47,28 +74,28 @@ class SiteLink extends Model
      */
     public function parseLinks()
     {
-        $client = new Client(['base_uri'=>$this->baseURI]);
-        try{
-            $res = $client->get($this->url);
-            $this->status=$res->getStatusCode();
-            if($this->status===200){
-                $html=$res->getBody()->getContents();
-                $saw = new nokogiri($html);
-                $links = $saw->get('a');
-                foreach($links as $link){
-                    if(!empty($link['href'])){
-                        SiteLink::createLink($link['href'],$this->url,$this->site);
+        if(SiteLink::isURLBelongsToSiteDomain($this->url,$this->site->url)){
+            $client = new Client(['base_uri'=>$this->baseURI]);
+            try{
+                $res = $client->get($this->url);
+                $this->status=$res->getStatusCode();
+                if($this->status===200){
+                    $html=$res->getBody()->getContents();
+                    $saw = new nokogiri($html);
+                    $links = $saw->get('a');
+                    foreach($links as $link){
+                        if(!empty($link['href'])){
+                            SiteLink::createLink($link['href'],$this->url,$this->site);
+                        }
                     }
+                    $this->save();
                 }
+            } catch(ConnectException $e){
+                //
+            } catch(RequestException $e){
+                //
             }
-        } catch(ConnectException $e){
-            $this->status=0;
-        } catch(RequestException $e){
-            $this->status=1;
-        } finally {
-            $this->save();
         }
-
     }
 
     /**

@@ -33,7 +33,7 @@ class ChangeSitelinkUrlAndDeleteLastRequestTime extends Migration
         if(Schema::hasTable('site_links')) {
             Schema::table('site_links', function (Blueprint $table) {
                 $table->dropColumn('url');
-                if(Schema::hasColumn('baseURI')){
+                if(Schema::hasColumn('site_links','baseURI')){
                     $table->dropColumn('baseURI');
                 }
             });
