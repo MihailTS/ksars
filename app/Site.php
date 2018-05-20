@@ -16,11 +16,11 @@ class Site extends Model
         if($this->links->count()===0){//ссылки для сайта еще не обрабатывались
             $siteMainLink=SiteLink::createLink($this->url,$this->url,$this);
             if($siteMainLink){
-                $siteMainLink->parseLinks();
+                $siteMainLink->analyzePage();
             }
         }else{
             foreach($this->links as $link){
-                $link->parseLinks();
+                $link->analyzePage();
                 //var_dump($link->url);
 
             }

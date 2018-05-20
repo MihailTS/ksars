@@ -6,7 +6,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use Wamania\Snowball\Russian;
 use Illuminate\Database\Eloquent\Model;
+use Malahierba\WordCounter\WordCounter;
 use nokogiri;
 
 class SiteLink extends Model
@@ -36,6 +38,7 @@ class SiteLink extends Model
     }
     public static function createLink(String $url, String $baseURI, Site $site, Integer $status=null)
     {
+        $siteLink = null;
         if($validURL=SiteLink::validateUrl($url,$site->url))
         {
             $siteLink = new SiteLink;
@@ -44,9 +47,8 @@ class SiteLink extends Model
             $siteLink->site_id = $site->id;
             $siteLink->status = $status;
             $siteLink->save();
-            return $siteLink;
         }
-
+        return $siteLink;
     }
 
     /**
@@ -61,19 +63,11 @@ class SiteLink extends Model
         if(!$urlHost){//относительная ссылка
             return true;
         }else{
-            var_dump($urlHost.":".$domainHost.
-                "(".(substr($urlHost, -strlen($domainHost)) === $domainHost).")");
-            //return true;
             return (substr($urlHost, -strlen($domainHost)) === $domainHost);
-            //return true;//(substr($urlHost, 0, strlen($domainHost)) === $domainHost);
         }
     }
 
-    /**
-     *  Парсит ссылки на странице
-     */
-    public function parseLinks()
-    {
+    public function analyzePage(){
         if(SiteLink::isURLBelongsToSiteDomain($this->url,$this->site->url)){
             $client = new Client(['base_uri'=>$this->baseURI]);
             try{
@@ -81,14 +75,11 @@ class SiteLink extends Model
                 $this->status=$res->getStatusCode();
                 if($this->status===200){
                     $html=$res->getBody()->getContents();
-                    $saw = new nokogiri($html);
-                    $links = $saw->get('a');
-                    foreach($links as $link){
-                        if(!empty($link['href'])){
-                            SiteLink::createLink($link['href'],$this->url,$this->site);
-                        }
-                    }
-                    $this->save();
+                    $content = new nokogiri($html);
+                    $this->parseLinks($content);
+
+                    $this->parseKeywords($content);
+
                 }
             } catch(ConnectException $e){
                 //
@@ -99,11 +90,49 @@ class SiteLink extends Model
     }
 
     /**
+     *  Парсит ссылки на странице
+     */
+    public function parseLinks(nokogiri $content)
+    {
+        $links = $content->get('a');
+        foreach($links as $link){
+            if(!empty($link['href'])){
+                SiteLink::createLink($link['href'],$this->url,$this->site);
+            }
+        }
+        $this->save();
+    }
+
+    /**
      *  Парсит ключевые слова на странице
      */
-    public function parseKeywords()
+    public function parseKeywords(nokogiri $content)
     {
+        $allText = $content->toText();
+        $wordcounter = new WordCounter($allText);
 
+        $total = $wordcounter->countEachWord();
+        $total = array_filter($total,function($item){
+            $valid = false;
+            if(mb_strlen($item->word)>4){
+                $valid = !preg_match('/[^А-Яа-яЁё]/', $item->word);
+            }
+            return $valid;
+        });
+        $stemmer = new Russian();
+        $stemTextArr = array_reduce($total,function($carry,$item) use ($stemmer){
+            $word = $stemmer->stem($item->word);
+
+            if(!key_exists($word,$carry)){
+                $carry[$word] = $item->count;
+            }else{
+                $carry[$word] += $item->count;
+            }
+            return $carry;
+        },[]);
+        arsort($stemTextArr);
+        $stemTextArr = array_slice($stemTextArr, 0, 5, true);
+        var_dump($stemTextArr);
     }
 
     public function site(){

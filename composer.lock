@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "84d1ce98b735fd4405ffc4f67b3c735b",
+    "content-hash": "7b2f1dbed4ff7285e0d136afe95afa97",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -868,6 +868,49 @@
                 "storage"
             ],
             "time": "2018-03-01T10:27:04+00:00"
+        },
+        {
+            "name": "malahierba-lab/word-counter",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/malahierba-lab/word-counter.git",
+                "reference": "006ac6d872fa2201f8a8f439fb8abb0401857d67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/malahierba-lab/word-counter/zipball/006ac6d872fa2201f8a8f439fb8abb0401857d67",
+                "reference": "006ac6d872fa2201f8a8f439fb8abb0401857d67",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "5.*",
+                "php": ">=5.5.18"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Malahierba\\WordCounter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "malahierba team",
+                    "email": "lab@malahierba.cl",
+                    "homepage": "http://malahierba.cl"
+                }
+            ],
+            "description": "Laravel simple tool for word counting tasks",
+            "keywords": [
+                "counter",
+                "laravel",
+                "words"
+            ],
+            "time": "2015-11-17T01:30:33+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -2498,6 +2541,50 @@
                 "environment"
             ],
             "time": "2016-09-01T10:05:43+00:00"
+        },
+        {
+            "name": "wamania/php-stemmer",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wamania/php-stemmer.git",
+                "reference": "6cc76829bddd46f7ae7678e0bf87a0c872c8cf58"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wamania/php-stemmer/zipball/6cc76829bddd46f7ae7678e0bf87a0c872c8cf58",
+                "reference": "6cc76829bddd46f7ae7678e0bf87a0c872c8cf58",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wamania\\Snowball\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wamania",
+                    "homepage": "http://wamania.com"
+                }
+            ],
+            "description": "Native PHP5 Stemmer",
+            "keywords": [
+                "php",
+                "porter",
+                "stemmer"
+            ],
+            "time": "2017-01-27T17:16:44+00:00"
         }
     ],
     "packages-dev": [
