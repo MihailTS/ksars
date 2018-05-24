@@ -5,6 +5,7 @@ namespace App;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use InvalidArgumentException;
 use GuzzleHttp\Psr7\Request;
 use Wamania\Snowball\Russian;
 use Illuminate\Database\Eloquent\Model;
@@ -68,6 +69,7 @@ class SiteLink extends Model
     }
 
     public function analyzePage(){
+        ini_set('max_execution_time', 300);
         if(SiteLink::isURLBelongsToSiteDomain($this->url,$this->site->url)){
             $client = new Client(['base_uri'=>$this->baseURI]);
             try{
@@ -85,6 +87,8 @@ class SiteLink extends Model
                 //
             } catch(RequestException $e){
                 //
+            } catch(InvalidArgumentException $e){
+
             }
         }
     }
@@ -132,7 +136,8 @@ class SiteLink extends Model
         },[]);
         arsort($stemTextArr);
         $stemTextArr = array_slice($stemTextArr, 0, 5, true);
-        var_dump($stemTextArr);
+        Keyword::clearTagsOfSiteLink($this);
+        Keyword::addFromArray($stemTextArr,$this);
     }
 
     public function site(){
