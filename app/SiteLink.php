@@ -156,23 +156,17 @@ class SiteLink extends Model
                 $query->where('id','!=',$currentLinkID)->where('site_id', $siteID);
             }
         )->get()->groupBy('site_link_id');
-        //$allLinksOfCurrentSite = SiteLink::where('site_id',$this->site->id)->select('id')->get();
 
-        /*foreach($a as $b){
-            var_dump($b->id);
-        }*/
-        //var_dump($this->site->url);
-        //SiteLink::where('site',$this->site)->where()
         $keywordWeightTotals = [];
         foreach($keywordsByLink as $keywordByLink){
             $summ = 0;
+            $positionsCount = count($keywordPositions);
             foreach($keywordByLink  as $keyword) {
-                $summ+=(SiteLink::TAGS_TO_PARSE_COUNT-$keyword->position+1)*
-                    $keyword->coefficient*
-                    (SiteLink::TAGS_TO_PARSE_COUNT-$keywordPositions[$keyword->name]+1);
+                $summ+=($positionsCount - $keyword->position+1) *
+                    $keyword->coefficient *
+                    ($positionsCount-$keywordPositions[$keyword->name]+1);
             }
             $keywordWeightTotals[$keyword->site_link_id]=$summ;
-            //var_dump($keyword->getWeightCoefficient());
         }
         arsort($keywordWeightTotals);
         var_dump($keywordWeightTotals);
