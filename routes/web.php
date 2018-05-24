@@ -15,3 +15,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/sites/', 'SiteController@index');
+Route::get('/similar/{id}', 'SiteLinkController@similar');

@@ -14,6 +14,8 @@ use nokogiri;
 
 class SiteLink extends Model
 {
+    const TAGS_TO_PARSE_COUNT = 10;
+
     protected $fillable = [
         'url',
         'baseURI',
@@ -126,7 +128,6 @@ class SiteLink extends Model
         $stemmer = new Russian();
         $stemTextArr = array_reduce($total,function($carry,$item) use ($stemmer){
             $word = $stemmer->stem($item->word);
-
             if(!key_exists($word,$carry)){
                 $carry[$word] = $item->count;
             }else{
@@ -135,12 +136,48 @@ class SiteLink extends Model
             return $carry;
         },[]);
         arsort($stemTextArr);
-        $stemTextArr = array_slice($stemTextArr, 0, 5, true);
+        $stemTextArr = array_slice($stemTextArr, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
+
         Keyword::clearTagsOfSiteLink($this);
         Keyword::addFromArray($stemTextArr,$this);
     }
 
+    public function findSimilar(){
+        $siteID = $this->site->id;
+        $currentLinkID = $this->id;
+        $currentKeywords = $this->keywords->pluck('name','position')->toArray();
+        $keywordPositions = array_flip($currentKeywords);
+        $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$currentKeywords)->whereHas(
+            'site_link',
+            function($query) use ($siteID,$currentLinkID){
+                $query->where('id','!=',$currentLinkID)->where('site_id', $siteID);
+            }
+        )->get()->groupBy('site_link_id');
+        //$allLinksOfCurrentSite = SiteLink::where('site_id',$this->site->id)->select('id')->get();
+
+        /*foreach($a as $b){
+            var_dump($b->id);
+        }*/
+        //var_dump($this->site->url);
+        //SiteLink::where('site',$this->site)->where()
+        $keywordWeightTotals = [];
+        foreach($keywordsByLink as $keywordByLink){
+            $summ = 0;
+            foreach($keywordByLink  as $keyword) {
+                $summ+=(SiteLink::TAGS_TO_PARSE_COUNT-$keyword->position)*$keyword->coefficient*$keywordPositions[$keyword->name];
+            }
+            $keywordWeightTotals[$keyword->site_link_id]=$summ;
+            //var_dump($keyword->getWeightCoefficient());
+        }
+        arsort($keywordWeightTotals);
+        var_dump($keywordWeightTotals);
+    }
+
     public function site(){
         return $this->belongsTo(Site::class);
+    }
+
+    public function keywords(){
+        return $this->hasMany(Keyword::class);
     }
 }
