@@ -31,6 +31,9 @@ class SiteLink extends Model
                 $url!='/' &&
                 !preg_match('/^(\'|#|tel|javascript|mailto)/i', $url)
             ){
+                if(substr($url, -1)==='/'){
+                    $url = substr($url, 0, -1);
+                }
                 $siteLinkDublicate=SiteLink::where("url",$url)->first();
                 if(!$siteLinkDublicate){
                     return $url;
@@ -164,7 +167,9 @@ class SiteLink extends Model
         foreach($keywordsByLink as $keywordByLink){
             $summ = 0;
             foreach($keywordByLink  as $keyword) {
-                $summ+=(SiteLink::TAGS_TO_PARSE_COUNT-$keyword->position)*$keyword->coefficient*$keywordPositions[$keyword->name];
+                $summ+=(SiteLink::TAGS_TO_PARSE_COUNT-$keyword->position+1)*
+                    $keyword->coefficient*
+                    (SiteLink::TAGS_TO_PARSE_COUNT-$keywordPositions[$keyword->name]+1);
             }
             $keywordWeightTotals[$keyword->site_link_id]=$summ;
             //var_dump($keyword->getWeightCoefficient());
