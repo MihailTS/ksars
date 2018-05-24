@@ -14,12 +14,15 @@ class Keyword extends Model
 
 
     public static function addFromArray($keywords, $siteLink){
+        $position = 1;
         foreach($keywords as $keyword=>$weight){
             $k = new Keyword();
-            $k->keyword = $keyword;
+            $k->name = $keyword;
             $k->weight = $weight;
             $k->site_link_id = $siteLink->id;
+            $k->position = $position;
             $k->save();
+            $position++;
         }
     }
 
