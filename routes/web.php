@@ -16,3 +16,5 @@ Route::get('/', function () {
 });
 Route::get('/sites/', 'SiteController@index');
 Route::get('/similar/{id}', 'SiteLinkController@similar');
+Route::get('/test/', 'VisitorController@test');
+Route::post('/testreceiver/', 'VisitorController@receive');

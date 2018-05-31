@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Site;
-use App\SiteLink;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\TransferStats;
-use Illuminate\Http\Request;
-use nokogiri;
+use App\Services\Contracts\SiteService;
 
 class SiteController extends Controller
 {
+
+    private $siteService;
+
+    /**
+     * @param SiteService $siteService
+     */
+    public function __construct(SiteService $siteService)
+    {
+        $this->siteService = $siteService;
+    }
+
     public function index()
     {
         $links=[];
-        $this->parseAll();
+        $this->siteService->parseAll();
         return view('sites',['sites'=>$links]);
-    }
-
-    public function parseAll()
-    {
-        $sites = Site::all();
-        foreach($sites as $site){
-            $site->parse($site);
-        }
     }
 }
