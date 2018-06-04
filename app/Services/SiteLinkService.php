@@ -17,12 +17,98 @@ class SiteLinkService implements SiteLinkServiceContract
 {
     const TAGS_TO_PARSE_COUNT = 10;
 
+    function _normalise($path, $encoding="UTF-8") {
+
+        // Attempt to avoid path encoding problems.
+        //$path = iconv($encoding, "$encoding//IGNORE//TRANSLIT", $path);
+        // Process the components
+        $parts = explode('/', $path);
+        $safe = array();
+        foreach ($parts as $idx => $part) {
+            if (empty($part) || ('.' == $part)) {
+                continue;
+            } elseif ('..' == $part) {
+                array_pop($safe);
+                continue;
+            } else {
+                $safe[] = $part;
+            }
+        }
+
+        // Return the "clean" path
+        $path = implode('/', $safe);
+        return $path;
+    }
+
+    function resolveUrl($base, $url) {
+        if(!$url){
+            return false;
+        }
+
+        if(!$base){
+            return false;
+        }
+
+        $base = trim($base, '/').'/';
+
+        $array_url = parse_url($url);
+
+        //Если ссылка абсолютная возвращаем ее
+        if(isset($array_url['scheme']) && isset($array_url['host'])){
+            return $url;
+        }
+
+        $array_base = parse_url($base);
+
+        $res = '';
+
+        if(empty($array_base['scheme']) || empty($array_base['host'])){
+            return false;
+        }
+
+        //Собираем абсолютную ссылку
+        $res.=$array_base['scheme'] . '://';
+
+        if(isset($array_base['user'])) {
+            $res .= $array_base['user'].':';
+        }
+
+        if(isset($array_base['pass'])) {
+            $res .= $array_base['pass'].'@';
+        }
+
+        $res.=$array_base['host'];
+
+        if(isset($array_base['port'])) {
+            $res .= ':'.$array_base['port'];
+        }
+
+        if(isset($array_url['path'])) {
+            //Если в относительной ссылке слеш указывает на корень сайта
+            if(strpos($array_url['path'],'/') === 0){
+                $base_path = '/';
+            } else {
+                $base_path = $array_base['path'];
+            }
+
+            $res .='/'.$this->_normalise($base_path.$array_url['path']);
+        }
+
+        if(isset($array_url['query'])){
+            $res.='?'.$array_url['query'];
+        }
+
+        return $res;
+    }
+
     public function validateUrl(String $url, String $siteUrl)
     {
+        $url = $this->resolveUrl($siteUrl,$url);
+
         if(SiteLinkService::isURLBelongsToSiteDomain($url,$siteUrl)){
             if(
                 $url!='/' &&
-                !preg_match('/^(\'|#|tel|javascript|mailto)/i', $url)
+                !preg_match('/^(\'|#|stype|tel|javascript|mailto)/i', $url)
             ){
                 if(substr($url, -1)==='/'){
                     $url = substr($url, 0, -1);

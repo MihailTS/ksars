@@ -10,6 +10,7 @@ class Keyword extends Model
         'keyword',
         'site_link_id',
         'weight',
+        'coefficient'
     ];
 
 
