@@ -27,4 +27,28 @@ class VisitorReceiveRequest extends FormRequest
             //
         ];
     }
+
+    public function getReferer()
+    {
+        return $this->headers->get('referer');
+    }
+
+    public function getVisitorCookie()
+    {
+        return $this->input('ksars');
+    }
+
+    public function getVisitorHash()
+    {
+        $ip = $this->ip();
+        $userAgent = $this->userAgent();
+        return MD5($ip.$userAgent);
+    }
+
+    public function getVisitHash()
+    {
+        $ip = $this->ip();
+        $userAgent = $this->userAgent();
+        return MD5($ip.time().$userAgent);
+    }
 }

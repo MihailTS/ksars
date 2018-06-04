@@ -13,7 +13,7 @@
         "laravel/tinker": "~1.0",
         "malahierba-lab/word-counter": "^0.1.1",
         "olamedia/nokogiri": "^1.0",
-        "wamania/php-stemmer": "^1.2"
+        "wamania/php-stemmer ": "^1.2"
     },
     "require-dev": {
         "filp/whoops": "~2.0",

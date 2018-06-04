@@ -93,7 +93,7 @@ class SiteLinkService implements SiteLinkServiceContract
 
             $res .='/'.$this->_normalise($base_path.$array_url['path']);
         }
-
+        $res = trim($res, '/').'/';
         if(isset($array_url['query'])){
             $res.='?'.$array_url['query'];
         }
@@ -113,10 +113,7 @@ class SiteLinkService implements SiteLinkServiceContract
                 if(substr($url, -1)==='/'){
                     $url = substr($url, 0, -1);
                 }
-                $siteLinkDublicate=SiteLink::where("url",$url)->first();
-                if(!$siteLinkDublicate){
-                    return $url;
-                }
+                return $url;
             }
         }
         return false;
@@ -126,6 +123,10 @@ class SiteLinkService implements SiteLinkServiceContract
         $siteLink = null;
         if($validURL=$this->validateUrl($url, $site->url))
         {
+            $siteLinkDublicate=SiteLink::where("url",$validURL)->first();
+            if($siteLinkDublicate){
+                return $siteLinkDublicate;
+            }
             $siteLink = new SiteLink;
             $siteLink->url = $validURL;
             $siteLink->baseURI = $baseURI;

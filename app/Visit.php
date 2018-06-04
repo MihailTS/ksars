@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Visit extends Model
 {
     protected $fillable = [
-        'timeOnPage',
+        'time_on_page',
         'visitor_id',
-        'site_link_id'
+        'site_link_id',
+        'ip',
+        'user_agent'
     ];
 
     public function visitor(){
