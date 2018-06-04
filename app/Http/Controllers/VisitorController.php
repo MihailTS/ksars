@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VisitorReceiveRequest;
 use App\Services\Contracts\VisitorService;
+use App\SiteLink;
 use Illuminate\Http\Request;
 
 class VisitorController extends Controller
@@ -23,8 +24,15 @@ class VisitorController extends Controller
         return view('visit');
     }
     public function receive(VisitorReceiveRequest $request){
-        echo json_encode($request->cookie('laravel_session'));
-        //dd($request->ip().$request->userAgent());
+        $ip = $request->ip();
+        $referer = $request->headers->get('referer');
+        $ksars = $request->input('ksars');
+        $userAgent = $request->userAgent();
+        $visitorHash = MD5($ip.$userAgent);
+        $visitHash = MD5($ip.time().$userAgent);
+        $parsedReferer = parse_url($referer);
+        $a=SiteLink::where('url',$referer)->orWhere('url',$parsedReferer['path'])->get();
+        echo json_encode(['visitor'=>$visitorHash,'visit'=>$visitHash,'test'=>$a]);
     }
 
 

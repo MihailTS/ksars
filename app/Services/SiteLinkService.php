@@ -69,7 +69,12 @@ class SiteLinkService implements SiteLinkServiceContract
     public function analyzePage(SiteLink $siteLink){
         ini_set('max_execution_time', 300);
         if($this->isURLBelongsToSiteDomain($siteLink->url,$siteLink->site->url)){
-            $client = new Client(['base_uri'=>$siteLink->baseURI]);
+            $baseURL = $siteLink->baseURI;
+            if(substr($baseURL,0,1)==='/'){
+                $baseURL = $siteLink->site->url . $baseURL;
+            }
+
+            $client = new Client(['base_uri'=>$baseURL]);
             try{
                 $res = $client->get($siteLink->url);
                 $siteLink->status=$res->getStatusCode();
