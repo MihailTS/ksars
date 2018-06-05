@@ -7,6 +7,7 @@ use App\Http\Requests\VisitorReceiveTimeRequest;
 use App\Services\Contracts\VisitorService;
 use App\SiteLink;
 use App\Visit;
+use App\Visitor;
 use Carbon;
 use Illuminate\Http\Request;
 
@@ -33,5 +34,16 @@ class VisitorController extends Controller
 
     public function receiveTime(VisitorReceiveTimeRequest $request){
         $this->visitorService->receiveTimeVisit($request);
+    }
+
+
+    public function allVisitorStats(){
+        $visitors = Visitor::all();
+        return view('visitors',['visitors'=>$visitors]);
+    }
+
+    public function allVisits(Visitor $visitor){
+        $visitors = Visitor::all();
+        return view('visits',['visitors'=>$visitors]);
     }
 }

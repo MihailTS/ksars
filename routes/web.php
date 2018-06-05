@@ -19,3 +19,6 @@ Route::get('/similar/{id}', 'SiteLinkController@similar');
 Route::get('/test/', 'VisitorController@test');
 Route::post('/testreceiver/', ['as' => 'visitorReceiverLink', 'uses' => 'VisitorController@receive']);
 Route::post('/testvisittime/', ['as' => 'visitorTestReceiverTime', 'uses' => 'VisitorController@receiveTime']);
+
+Route::get('visitors/','VisitorController@allVisitorStats');
+Route::get('visitors/{id}','VisitorController@allVisits');
