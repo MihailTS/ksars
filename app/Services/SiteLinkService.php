@@ -208,10 +208,11 @@ class SiteLinkService implements SiteLinkServiceContract
         $wordcounter = new WordCounter($allText);
 
         $total = $wordcounter->countEachWord();
+
         $total = array_filter($total,function($item){
             $valid = false;
-            if(mb_strlen($item->word)>4){
-                $valid = !preg_match('/[^А-Яа-яЁё]/', $item->word);
+            if(mb_strlen($item->word)>3){
+                $valid = !preg_match('/[^А-Яа-яЁё]/u', $item->word);
             }
             return $valid;
         });
@@ -225,6 +226,7 @@ class SiteLinkService implements SiteLinkServiceContract
             }
             return $carry;
         },[]);
+
         arsort($stemTextArr);
         $stemTextArr = array_slice($stemTextArr, 0, SiteLinkService::TAGS_TO_PARSE_COUNT, true);
         return $stemTextArr;
@@ -246,7 +248,7 @@ class SiteLinkService implements SiteLinkServiceContract
         $keywordWeightTotals = [];
         foreach($keywordsByLink as $keywordByLink){
             $summ = 0;
-            $positionsCount = count($keywordPositions);
+            $positionsCount = SiteLinkService::TAGS_TO_PARSE_COUNT;
             foreach($keywordByLink  as $keyword) {
                 $summ+=($positionsCount - $keyword->position+1) *
                     $keyword->coefficient *
