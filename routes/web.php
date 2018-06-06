@@ -11,9 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::get('/sites/', 'SiteController@index');
 Route::get('/similar/{id}', 'SiteLinkController@similar');
 Route::get('/test/', 'VisitorController@test');
@@ -21,4 +18,5 @@ Route::post('/testreceiver/', ['as' => 'visitorReceiverLink', 'uses' => 'Visitor
 Route::post('/testvisittime/', ['as' => 'visitorTestReceiverTime', 'uses' => 'VisitorController@receiveTime']);
 
 Route::get('visitors/','VisitorController@allVisitorStats');
+Route::get('/','VisitorController@allVisitorStats');
 Route::get('visitors/{id}','VisitorController@allVisits');
