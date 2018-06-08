@@ -257,8 +257,8 @@ class SiteLinkService implements SiteLinkServiceContract
         }
         arsort($keywordWeightTotals);
         $keywordWeightTotals = array_slice($keywordWeightTotals, 0, 10, true);
-        foreach($keywordWeightTotals as &$keyword){
-            $keyword = Keyword::find($keyword);
+        foreach($keywordWeightTotals as $keywordKey=>&$keyword){
+            $keyword = Keyword::find($keywordKey);
         }
         return $keywordWeightTotals;
     }

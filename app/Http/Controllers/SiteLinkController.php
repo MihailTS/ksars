@@ -32,6 +32,7 @@ class SiteLinkController extends Controller
 
             $siteLinkKeywords[] = $keywordArr;
         }
+
         return view('site_link',['siteLink'=>$siteLink,'similarLinks'=>$similarLinks, "siteLinkKeywords"=>$siteLinkKeywords]);
     }
 }
