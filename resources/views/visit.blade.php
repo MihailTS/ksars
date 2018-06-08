@@ -53,7 +53,7 @@
                         params += "ksars="+ ksarsCookie;
                     }
 
-                    xhr.open('POST', 'http://ksars/testreceiver');
+                    xhr.open('POST', 'http://ksars.ru/api/receive_visitor');
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     var that = this;
                     xhr.onreadystatechange=function(){
@@ -63,8 +63,8 @@
                             that.visitorID = response.visitor;
                             that.visitID = response.visit;
                             that.setCookie("ksars",response.visitor,{expires:60*60*24*30});
+                            setInterval(function(){that.sendVisitTimeData()},2000);
                         }
-                        setInterval(function(){that.sendVisitTimeData()},2000);
                     };
                     xhr.send(params);
 
@@ -72,7 +72,7 @@
                 sendVisitTimeData: function(){
                     var xhr = new XMLHttpRequest();
                     var params = "visitor=" + this.visitorID + "&visit=" + this.visitID;
-                    xhr.open('POST', 'http://ksars/testvisittime');
+                    xhr.open('POST', 'http://ksars.ru/api/receive_visit_time');
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     xhr.send(params);
                 }

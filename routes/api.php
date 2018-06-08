@@ -16,3 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::post('/receive_visitor/', 'VisitorController@receive');
+Route::post('/receive_visit_time/', 'VisitorController@receiveTime');
