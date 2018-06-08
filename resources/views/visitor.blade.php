@@ -42,6 +42,15 @@
                 </ul>
             </div>
 
+            <div class="visits-title">Подходящие по интересам:</div>
+            <ul class="similar">
+                @foreach($similarLinks as $similarLink)
+                    <li class="visit-row">
+                        <a href="/links/{{$similarLink['entity']->id}}">{{$similarLink['entity']->url}} ({{$similarLink['weight']}})</a>
+                    </li>
+                @endforeach
+            </ul>
+
             <div class="visits-title">Посещения сайтов пользователем:</div>
             <table class="visits">
                  <tr class="visits-head visit-row">
@@ -67,6 +76,7 @@
                          </td>
                      </tr>
                  @endforeach
+
             </table>
         </div>
         <script src="{{asset('js/app.js')}}"></script>

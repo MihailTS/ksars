@@ -231,6 +231,27 @@ class SiteLinkService implements SiteLinkServiceContract
         return $stemTextArr;
     }
 
+
+    public function findSimilarByKeywords($keywords){
+        $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$keywords)
+            ->get()->groupBy('site_link_id');
+        $keywordPositions = array_flip($keywords);
+        $keywordWeightTotals = [];
+        foreach($keywordsByLink as $keywordByLink){
+            $summ = 0;
+            $positionsCount = SiteLink::TAGS_TO_PARSE_COUNT;
+            foreach($keywordByLink  as $keyword) {
+                $summ+=($positionsCount - $keyword->position+1) *
+                    $keyword->coefficient *
+                    ($positionsCount-$keywordPositions[$keyword->name]+1);
+                $keywordWeightTotals[$keyword->site_link_id]=$summ;
+            }
+        }
+        arsort($keywordWeightTotals);
+        $keywordWeightTotals = array_slice($keywordWeightTotals, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
+        return $keywordWeightTotals;
+    }
+
     public function findSimilar(SiteLink $siteLink){
         $siteID = $siteLink->site->id;
         $currentLinkID = $siteLink->id;

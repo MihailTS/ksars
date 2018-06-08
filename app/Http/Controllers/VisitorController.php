@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\VisitorReceiveRequest;
 use App\Http\Requests\VisitorReceiveTimeRequest;
 use App\Services\Contracts\VisitorService;
+use App\Services\Contracts\SiteLinkService;
 use App\SiteLink;
 use App\Visit;
 use App\Visitor;
@@ -20,9 +21,10 @@ class VisitorController extends Controller
      * @param VisitorService $visitorService
      * @param SiteLinkService $siteLinkService
      */
-    public function __construct(VisitorService $visitorService)
+    public function __construct(VisitorService $visitorService,SiteLinkService $siteLinkService)
     {
         $this->visitorService = $visitorService;
+        $this->siteLinkService = $siteLinkService;
     }
 
 
@@ -70,6 +72,20 @@ class VisitorController extends Controller
         arsort($visitorKeywords);
         $visitorKeywords = array_slice($visitorKeywords, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
 
-        return view('visitor',['visits'=>$visits, 'visitor'=>$visitor, 'keywords'=>$keywords,'visitorKeywords'=>$visitorKeywords]);
+        $visitorPositionKeywords = [];
+        $similarLinks = [];
+
+        $curPosition = 1;
+        foreach($visitorKeywords as $visitorKeywordKey=>$visitorKeyword){
+            $visitorPositionKeywords[$curPosition] = $visitorKeywordKey;
+            $curPosition++;
+        }
+        $similarLinksData = $this->siteLinkService->findSimilarByKeywords($visitorPositionKeywords);
+
+        foreach($similarLinksData as $similarLinkID=>$similarLinkWeight){
+            $similarLinks[] = ["entity"=>SiteLink::find($similarLinkID),"weight"=>$similarLinkWeight];
+
+        }
+        return view('visitor',['visits'=>$visits, 'visitor'=>$visitor, 'keywords'=>$keywords,'visitorKeywords'=>$visitorKeywords, 'similarLinks'=>$similarLinks]);
     }
 }
