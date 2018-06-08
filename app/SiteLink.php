@@ -14,6 +14,7 @@ use nokogiri;
 
 class SiteLink extends Model
 {
+    const TAGS_TO_PARSE_COUNT = 10;
 
     protected $fillable = [
         'url',

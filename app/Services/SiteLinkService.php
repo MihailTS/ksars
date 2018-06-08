@@ -15,7 +15,6 @@ use nokogiri;
 
 class SiteLinkService implements SiteLinkServiceContract
 {
-    const TAGS_TO_PARSE_COUNT = 10;
 
     function _normalise($path, $encoding="UTF-8") {
 
@@ -228,7 +227,7 @@ class SiteLinkService implements SiteLinkServiceContract
         },[]);
 
         arsort($stemTextArr);
-        $stemTextArr = array_slice($stemTextArr, 0, SiteLinkService::TAGS_TO_PARSE_COUNT, true);
+        $stemTextArr = array_slice($stemTextArr, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
         return $stemTextArr;
     }
 
@@ -246,20 +245,18 @@ class SiteLinkService implements SiteLinkServiceContract
 
         $keywordWeightTotals = [];
         foreach($keywordsByLink as $keywordByLink){
+
             $summ = 0;
-            $positionsCount = SiteLinkService::TAGS_TO_PARSE_COUNT;
+            $positionsCount = SiteLink::TAGS_TO_PARSE_COUNT;
             foreach($keywordByLink  as $keyword) {
                 $summ+=($positionsCount - $keyword->position+1) *
                     $keyword->coefficient *
                     ($positionsCount-$keywordPositions[$keyword->name]+1);
+                $keywordWeightTotals[$keyword->site_link_id]=$summ;
             }
-            $keywordWeightTotals[$keyword->site_link_id]=$summ;
         }
         arsort($keywordWeightTotals);
-        $keywordWeightTotals = array_slice($keywordWeightTotals, 0, 10, true);
-        foreach($keywordWeightTotals as $siteLinkID=>&$siteLink){
-            $siteLink = SiteLink::find($siteLinkID);
-        }
+        $keywordWeightTotals = array_slice($keywordWeightTotals, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
         return $keywordWeightTotals;
     }
 }

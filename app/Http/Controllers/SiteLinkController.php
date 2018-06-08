@@ -22,7 +22,12 @@ class SiteLinkController extends Controller
     public function linkInfo($id)
     {
         $siteLink = SiteLink::findOrFail($id);
-        $similarLinks = $this->siteLinkService->findSimilar($siteLink);
+        $similarLinks = [];
+        $similarLinksData = $this->siteLinkService->findSimilar($siteLink);
+
+        foreach($similarLinksData as $similarLinkID=>$similarLinkWeight){
+            $similarLinks[] = ["entity"=>SiteLink::find($similarLinkID),"weight"=>$similarLinkWeight];
+        }
         $siteLinkKeywords = [];
         foreach($siteLink->keywords as $keyword){
             $keywordArr = [];

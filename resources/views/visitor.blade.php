@@ -55,7 +55,7 @@
 
                  @foreach($visits as $visit)
                      <tr class="visit-row">
-                         <td>{{$visit->site_link->url}}</td>
+                         <td><a href="/links/{{$visit->site_link->id}}">{{$visit->site_link->url}}</td>
                          <td>{{$visit->created_at}}</td>
                          <td>{{$visit->time_on_page}}</td>
                          <td>{{$visit->ip}}</td>

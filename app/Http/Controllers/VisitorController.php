@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\VisitorReceiveRequest;
 use App\Http\Requests\VisitorReceiveTimeRequest;
 use App\Services\Contracts\VisitorService;
-use App\Services\Contracts\SiteLinkService;
 use App\SiteLink;
 use App\Visit;
 use App\Visitor;
@@ -21,10 +20,9 @@ class VisitorController extends Controller
      * @param VisitorService $visitorService
      * @param SiteLinkService $siteLinkService
      */
-    public function __construct(VisitorService $visitorService, SiteLinkService $siteLinkService)
+    public function __construct(VisitorService $visitorService)
     {
         $this->visitorService = $visitorService;
-        $this->siteLinkService = $siteLinkService;
     }
 
 
@@ -59,7 +57,7 @@ class VisitorController extends Controller
                 foreach($vKeywords as $vKeyword){
                     if(!empty($vKeyword)){
                         $vKeywordKoef = $vKeyword['coefficient']*
-                            (SiteLinkService::TAGS_TO_PARSE_COUNT - $vKeyword['position'] + 1);
+                            (SiteLink::TAGS_TO_PARSE_COUNT - $vKeyword['position'] + 1);
                         if(!empty($visitorKeywords[$vKeyword['name']])){
                             $visitorKeywords[$vKeyword['name']] += $vKeywordKoef;
                         }else{
@@ -70,7 +68,7 @@ class VisitorController extends Controller
             }
         }
         arsort($visitorKeywords);
-        $visitorKeywords = array_slice($visitorKeywords, 0, 10, true);
+        $visitorKeywords = array_slice($visitorKeywords, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
 
         return view('visitor',['visits'=>$visits, 'visitor'=>$visitor, 'keywords'=>$keywords,'visitorKeywords'=>$visitorKeywords]);
     }

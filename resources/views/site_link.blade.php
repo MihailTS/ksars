@@ -34,7 +34,7 @@
             </ul>
 
             <div class="link-keywords">
-                <div class="link-keywords__title">Интересы пользователя</div>
+                <div class="link-keywords__title">Ключевые слова страницы:</div>
                 <ul>
 
                     @foreach($siteLinkKeywords as $linkKeyword)
@@ -48,7 +48,7 @@
 
                 @foreach($similarLinks as $similarLink)
                     <li class="visit-row">
-                        <a href="/links/{{$similarLink->id}}">{{$similarLink->url}}</a>
+                        <a href="/links/{{$similarLink['entity']->id}}">{{$similarLink['entity']->url}} ({{$similarLink['weight']}})</a>
                     </li>
                 @endforeach
             </ul>
