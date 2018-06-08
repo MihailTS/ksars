@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\VisitorReceiveRequest;
 use App\Http\Requests\VisitorReceiveTimeRequest;
 use App\Services\Contracts\VisitorService;
-use App\Services\SiteLinkService;
+use App\Services\Contracts\SiteLinkService;
 use App\SiteLink;
 use App\Visit;
 use App\Visitor;
@@ -15,13 +15,16 @@ use Illuminate\Http\Request;
 class VisitorController extends Controller
 {
     private $visitorService;
+    private $siteLinkService;
 
     /**
      * @param VisitorService $visitorService
+     * @param SiteLinkService $siteLinkService
      */
-    public function __construct(VisitorService $visitorService)
+    public function __construct(VisitorService $visitorService, SiteLinkService $siteLinkService)
     {
         $this->visitorService = $visitorService;
+        $this->siteLinkService = $siteLinkService;
     }
 
 

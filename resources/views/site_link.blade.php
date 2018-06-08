@@ -46,9 +46,9 @@
             <div class="similar-title">Страницы похожие на эту:</div>
             <ul class="similar">
 
-                @foreach($similarLinks as $similarLinkID => $similarLink)
+                @foreach($similarLinks as $similarLink)
                     <tr class="visit-row">
-                        <td><a href="/links/{{$similarLinkID}}">{{$similarLink}}</a></td>
+                        <td><a href="/links/{{$similarLink->id}}">{{$similarLink->url}}</a></td>
                     </tr>
                 @endforeach
             </ul>

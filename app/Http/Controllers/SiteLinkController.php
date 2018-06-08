@@ -19,13 +19,14 @@ class SiteLinkController extends Controller
         $this->siteLinkService = $siteLinkService;
     }
 
-    public function linkInfo($id){
+    public function linkInfo($id)
+    {
         $siteLink = SiteLink::findOrFail($id);
         $similarLinks = $this->siteLinkService->findSimilar($siteLink);
         $siteLinkKeywords = [];
         foreach($siteLink->keywords as $keyword){
             $keywordArr = [];
-            $keywordArr["weight"] = $keyword->coefficient;
+            $keywordArr["weight"] = $keyword->weight*$keyword->coefficient;
             $keywordArr["name"] = $keyword->name;
             $keywordArr["ID"] = $keyword->id;
 
