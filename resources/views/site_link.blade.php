@@ -47,9 +47,9 @@
             <ul class="similar">
 
                 @foreach($similarLinks as $similarLink)
-                    <tr class="visit-row">
-                        <td><a href="/links/{{$similarLink->id}}">{{$similarLink->url}}</a></td>
-                    </tr>
+                    <li class="visit-row">
+                        <a href="/links/{{$similarLink->id}}">{{$similarLink->url}}</a>
+                    </li>
                 @endforeach
             </ul>
         </div>
