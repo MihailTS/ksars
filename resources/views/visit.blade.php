@@ -53,7 +53,7 @@
                         params += "ksars="+ ksarsCookie;
                     }
 
-                    xhr.open('POST', 'http://ksars/testreceiver/');
+                    xhr.open('POST', 'http://ksars/testreceiver');
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     var that = this;
                     xhr.onreadystatechange=function(){
@@ -72,13 +72,13 @@
                 sendVisitTimeData: function(){
                     var xhr = new XMLHttpRequest();
                     var params = "visitor=" + this.visitorID + "&visit=" + this.visitID;
-                    xhr.open('POST', 'http://ksars/testvisittime/');
+                    xhr.open('POST', 'http://ksars/testvisittime');
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     xhr.send(params);
                 }
             };
             var ksars = new Ksars();
-            ksars.identifyUser();
+            setTimeout(function(){ksars.identifyUser();},10000);
         </script>
     </body>
 </html>

@@ -233,7 +233,6 @@ class SiteLinkService implements SiteLinkServiceContract
     }
 
     public function findSimilar(SiteLink $siteLink){
-        echo "similar to link {$siteLink->url} are:<hr>";
         $siteID = $siteLink->site->id;
         $currentLinkID = $siteLink->id;
         $currentKeywords = $siteLink->keywords->pluck('name','position')->toArray();
@@ -257,9 +256,7 @@ class SiteLinkService implements SiteLinkServiceContract
             $keywordWeightTotals[$keyword->site_link_id]=$summ;
         }
         arsort($keywordWeightTotals);
-        $keywordWeightTotals = array_slice($keywordWeightTotals, 0, 5, true);
-        foreach($keywordWeightTotals as $linkID=>$weight){
-            echo "<br>".SiteLink::find($linkID)->url." : ".$weight;
-        }
+        $keywordWeightTotals = array_slice($keywordWeightTotals, 0, 10, true);
+        return $keywordWeightTotals;
     }
 }

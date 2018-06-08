@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Contracts\SiteLinkService;
+use App\Services\SiteLinkService;
 use App\SiteLink;
 use Illuminate\Http\Request;
 
@@ -19,7 +19,18 @@ class SiteLinkController extends Controller
         $this->siteLinkService = $siteLinkService;
     }
 
-    public function similar($id){
-        $this->siteLinkService->findSimilar($id);
+    public function linkInfo($id){
+        $siteLink = SiteLink::findOrFail($id);
+        $similarLinks = $this->siteLinkService->findSimilar($siteLink);
+        $siteLinkKeywords = [];
+        foreach($siteLink->keywords as $keyword){
+            $keywordArr = [];
+            $keywordArr["weight"] = $keyword->coefficient;
+            $keywordArr["name"] = $keyword->name;
+            $keywordArr["ID"] = $keyword->id;
+
+            $siteLinkKeywords[] = $keywordArr;
+        }
+        return view('site_link',['siteLink'=>$siteLink,'similarLinks'=>$similarLinks, "siteLinkKeywords"=>$siteLinkKeywords]);
     }
 }

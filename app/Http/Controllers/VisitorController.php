@@ -43,7 +43,7 @@ class VisitorController extends Controller
         return view('visitors',['visitors'=>$visitors]);
     }
 
-    public function allVisits($visitorID){
+    public function visitorInfo($visitorID){
         $visitor = Visitor::findOrFail($visitorID);
         $visits = $visitor->visits;
         $keywords = [];
@@ -67,7 +67,7 @@ class VisitorController extends Controller
             }
         }
         arsort($visitorKeywords);
-        $visitorKeywords = array_slice($visitorKeywords, 0, 5, true);
+        $visitorKeywords = array_slice($visitorKeywords, 0, 10, true);
 
         return view('visitor',['visits'=>$visits, 'visitor'=>$visitor, 'keywords'=>$keywords,'visitorKeywords'=>$visitorKeywords]);
     }
