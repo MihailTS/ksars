@@ -58,8 +58,8 @@ class VisitorController extends Controller
 
                 foreach($vKeywords as $vKeyword){
                     if(!empty($vKeyword)){
-                        $vKeywordKoef = $vKeyword['coefficient']*
-                            (SiteLink::TAGS_TO_PARSE_COUNT - $vKeyword['position'] + 1);
+                        $vKeywordKoef = $vKeyword['coefficient']
+                            /** (SiteLink::TAGS_TO_PARSE_COUNT - $vKeyword['position'] + 1)*/;
                         if(!empty($visitorKeywords[$vKeyword['name']])){
                             $visitorKeywords[$vKeyword['name']] += $vKeywordKoef;
                         }else{
