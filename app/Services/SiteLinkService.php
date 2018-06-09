@@ -241,9 +241,9 @@ class SiteLinkService implements SiteLinkServiceContract
             $summ = 0;
             $positionsCount = SiteLink::TAGS_TO_PARSE_COUNT;
             foreach($keywordByLink  as $keyword) {
-                $summ+=/*($positionsCount - $keyword->position+1) **/
-                    $keyword->coefficient *$keywordPositions[$keyword->name];
-                    //($positionsCount-$keywordPositions[$keyword->name]+1);
+                $summ+=($positionsCount - $keyword->position+1) *
+                    $keyword->coefficient *
+                    ($positionsCount-$keywordPositions[$keyword->name]+1);
                 $keywordWeightTotals[$keyword->site_link_id]=$summ;
             }
         }
@@ -255,7 +255,7 @@ class SiteLinkService implements SiteLinkServiceContract
     public function findSimilar(SiteLink $siteLink){
         $siteID = $siteLink->site->id;
         $currentLinkID = $siteLink->id;
-        $currentKeywords = $siteLink->keywords->pluck('name','coefficient')->toArray();
+        $currentKeywords = $siteLink->keywords->pluck('name','position')->toArray();
         $keywordPositions = array_flip($currentKeywords);
         $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$currentKeywords)->whereHas(
             'site_link',
@@ -270,10 +270,9 @@ class SiteLinkService implements SiteLinkServiceContract
             $summ = 0;
             $positionsCount = SiteLink::TAGS_TO_PARSE_COUNT;
             foreach($keywordByLink  as $keyword) {
-                $summ+=
-                    /*($positionsCount - $keyword->position+1) **/
-                    $keyword->coefficient * $keywordPositions[$keyword->name];
-                    //($positionsCount-$keywordPositions[$keyword->name]+1);
+                $summ+=($positionsCount - $keyword->position+1) *
+                    $keyword->coefficient *
+                    ($positionsCount-$keywordPositions[$keyword->name]+1);
                 $keywordWeightTotals[$keyword->site_link_id]=$summ;
             }
         }
