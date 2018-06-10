@@ -78,7 +78,7 @@
                 }
             };
             var ksars = new Ksars();
-            setTimeout(function(){ksars.identifyUser();},10000);
+            ksars.identifyUser();
         </script>
     </body>
 </html>

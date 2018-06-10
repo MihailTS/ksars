@@ -32,7 +32,7 @@
                 <li>Принадлежит к сайту {{$siteLink->site->url}}</li>
                 <li>Данные о странице последний раз обновлялись: {{$siteLink->updated_at}}</li>
             </ul>
-
+            @if($siteLinkKeywords)
             <div class="link-keywords">
                 <div class="link-keywords__title">Ключевые слова страницы:</div>
                 <ul>
@@ -42,7 +42,9 @@
                     @endforeach
                 </ul>
             </div>
+            @endif
 
+            @if($similarLinks)
             <div class="similar-title">Страницы похожие на эту:</div>
             <ul class="similar">
 
@@ -52,6 +54,8 @@
                     </li>
                 @endforeach
             </ul>
+            @endif
+
         </div>
         <script src="{{asset('js/app.js')}}"></script>
 

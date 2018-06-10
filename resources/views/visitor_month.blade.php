@@ -27,10 +27,7 @@
     </head>
     <body>
         <div class="wrapper">
-            <ul class="visitor-info">
-                <li>Уникальный идентификатор: {{$visitor->hash}}</li>
-                <li>Дата первого посещения: {{$visitor->created_at}}</li>
-            </ul>
+            <h1>Информация об интересах пользователя {{$visitor->hash}} за {{$monthName}}</h1>
 
             <div class="visitor-keywords">
                 <div class="visitor-keywords__title">Интересы пользователя</div>
@@ -41,19 +38,6 @@
                     @endforeach
                 </ul>
             </div>
-            <div>Показать интересы за:
-                <a href="/visitors/{{$visitor->id}}/m/0">{{$months[0]}}</a>,
-                <a href="/visitors/{{$visitor->id}}/m/1">{{$months[1]}}</a>,
-                <a href="/visitors/{{$visitor->id}}/m/2">{{$months[2]}}</a>
-            </div>
-            <div class="visits-title">Подходящие по интересам:</div>
-            <ul class="similar">
-                @foreach($similarLinks as $similarLink)
-                    <li class="visit-row">
-                        <a href="/links/{{$similarLink['entity']->id}}">{{$similarLink['entity']->url}} ({{$similarLink['weight']}})</a>
-                    </li>
-                @endforeach
-            </ul>
 
             <div class="visits-title">Посещения сайтов пользователем:</div>
             <table class="visits">

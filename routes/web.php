@@ -20,4 +20,5 @@ Route::post('/testvisittime/', 'VisitorController@receiveTime');
 Route::get('/visitors/','VisitorController@allVisitorStats');
 Route::get('/','VisitorController@allVisitorStats');
 Route::get('/visitors/{id}','VisitorController@visitorInfo');
+Route::get('/visitors/{id}/m/{monthAgo}','VisitorController@visitorInfoByMonthAgo');
 Route::get('/links/{id}','SiteLinkController@linkInfo');
