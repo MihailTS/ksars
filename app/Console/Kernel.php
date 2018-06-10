@@ -24,7 +24,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controller\SiteController@index')->hourly();
+        $schedule->call(function () {
+		    $service = new \App\Services\SiteService(new \App\Services\SiteLinkService);
+		    $service->parseAll();
+		})->hourly();
     }
 
     /**
