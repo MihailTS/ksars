@@ -8,6 +8,7 @@ use App\Services\Contracts\SiteLinkService as SiteLinkServiceContract;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Wamania\Snowball\Russian;
 use Malahierba\WordCounter\WordCounter;
@@ -43,7 +44,7 @@ class SiteLinkService implements SiteLinkServiceContract
         if(!$url){
             return false;
         }
-
+        $url = mb_substr($url,0,strrpos($url,'#')?:null);
         if(!$base){
             return false;
         }
@@ -54,6 +55,7 @@ class SiteLinkService implements SiteLinkServiceContract
 
         //Если ссылка абсолютная возвращаем ее
         if(isset($array_url['scheme']) && isset($array_url['host'])){
+            $url = trim($url, '/').'/';
             return $url;
         }
 
@@ -96,22 +98,17 @@ class SiteLinkService implements SiteLinkServiceContract
         if(isset($array_url['query'])){
             $res.='?'.$array_url['query'];
         }
-
         return $res;
     }
 
     public function validateUrl(String $url, String $siteUrl)
     {
         $url = $this->resolveUrl($siteUrl,$url);
-
         if(SiteLinkService::isURLBelongsToSiteDomain($url,$siteUrl)){
             if(
                 $url!='/' &&
                 !preg_match('/^(\'|#|stype|tel|javascript|mailto)/i', $url)
             ){
-                if(substr($url, -1)==='/'){
-                    $url = substr($url, 0, -1);
-                }
                 return $url;
             }
         }
@@ -170,9 +167,10 @@ class SiteLinkService implements SiteLinkServiceContract
                     $this->parseLinks($siteLink, $content);
 
                     Keyword::clearTagsOfSiteLink($siteLink);
-                    $keywordsArray = $this->parseKeywords($content);
-
-                    Keyword::addFromArray($keywordsArray,$siteLink);
+                    if($this->isParsingAllowed($content)){
+                        $keywordsArray = $this->parseKeywords($content);
+                        Keyword::addFromArray($keywordsArray,$siteLink);
+                    }
                 }
             } catch(ConnectException $e){
                 //
@@ -184,6 +182,21 @@ class SiteLinkService implements SiteLinkServiceContract
         }
     }
 
+    public function isParsingAllowed(nokogiri $content){
+        $allowed = false;
+        try {
+            $ksarsMeta = $content->get('meta[property="ksars"]');
+            foreach($ksarsMeta as $ksarsMetaTag){
+                if($ksarsMetaTag["allow"] == 'true'){
+                    $allowed = true;
+                }
+            }
+        }catch(\Exception $e){
+
+        }
+        return $allowed;
+
+    }
     /**
      *  Парсит ссылки на странице
      */
@@ -233,17 +246,14 @@ class SiteLinkService implements SiteLinkServiceContract
 
 
     public function findSimilarByKeywords($keywords){
-        $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$keywords)
+        $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',array_keys($keywords))
             ->get()->groupBy('site_link_id');
-        $keywordPositions = array_flip($keywords);
         $keywordWeightTotals = [];
         foreach($keywordsByLink as $keywordByLink){
             $summ = 0;
-            $positionsCount = SiteLink::TAGS_TO_PARSE_COUNT;
             foreach($keywordByLink  as $keyword) {
-                $summ+=($positionsCount - $keyword->position+1) *
-                    $keyword->coefficient *
-                    ($positionsCount-$keywordPositions[$keyword->name]+1);
+                $summ+= $keyword->coefficient *
+                    $keywords[$keyword->name];
                 $keywordWeightTotals[$keyword->site_link_id]=$summ;
             }
         }
@@ -255,9 +265,9 @@ class SiteLinkService implements SiteLinkServiceContract
     public function findSimilar(SiteLink $siteLink){
         $siteID = $siteLink->site->id;
         $currentLinkID = $siteLink->id;
-        $currentKeywords = $siteLink->keywords->pluck('name','position')->toArray();
-        $keywordPositions = array_flip($currentKeywords);
-        $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$currentKeywords)->whereHas(
+        $currentKeywords = $siteLink->keywords;
+        $currentKeywordsArray = $siteLink->keywords->pluck('name')->toArray();
+        $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$currentKeywordsArray)->whereHas(
             'site_link',
             function($query) use ($siteID,$currentLinkID){
                 $query->where('id','!=',$currentLinkID)->where('site_id', $siteID);
@@ -268,11 +278,10 @@ class SiteLinkService implements SiteLinkServiceContract
         foreach($keywordsByLink as $keywordByLink){
 
             $summ = 0;
-            $positionsCount = SiteLink::TAGS_TO_PARSE_COUNT;
             foreach($keywordByLink  as $keyword) {
-                $summ+=($positionsCount - $keyword->position+1) *
-                    $keyword->coefficient *
-                    ($positionsCount-$keywordPositions[$keyword->name]+1);
+                $compareKeyword = $currentKeywords->where('name',$keyword->name)->first();
+                $summ+= $keyword->coefficient *
+                    $compareKeyword->coefficient;
                 $keywordWeightTotals[$keyword->site_link_id]=$summ;
             }
         }
