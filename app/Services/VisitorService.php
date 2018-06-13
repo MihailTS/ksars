@@ -75,4 +75,35 @@ class VisitorService implements VisitorServiceContract
         }
 
     }
+
+    public function getVisitsKeywords(Visitor $visitor){
+        $visits = $visitor->visits->where('time_on_page','>',10);
+        $keywords = [];
+        $visitorKeywords = [];
+        foreach($visits as $visit){
+            $vKeywords = $visit->site_link->keywords;
+            if(empty($keywords[$visit->site_link->id])){
+                $keywords[$visit->site_link->id] = $vKeywords->toArray();
+
+                foreach($vKeywords as $vKeyword){
+                    if(!empty($vKeyword)){
+                        $vKeywordKoef = $vKeyword['coefficient'];
+                        if(!empty($visitorKeywords[$vKeyword['name']])){
+                            $visitorKeywords[$vKeyword['name']] += $vKeywordKoef;
+                        }else{
+                            $visitorKeywords[$vKeyword['name']] = $vKeywordKoef;
+                        }
+                    }
+                }
+            }
+        }
+        arsort($visitorKeywords);
+        $visitorKeywords = array_slice($visitorKeywords, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
+
+        $visitsKeywords = new \stdClass;
+        $visitsKeywords->visitorKeywords = $visitorKeywords;
+        $visitsKeywords->visits = $visits;
+        $visitsKeywords->siteLinkKeywords = $keywords;
+        return $visitsKeywords;
+    }
 }

@@ -13,6 +13,7 @@
 
 Route::get('/sites/', 'SiteController@index');
 Route::get('/test/', 'VisitorController@test');
+Route::get('/bannerScriptTest/', 'VisitorController@bannerScriptTest');
 
 Route::post('/testreceiver/', 'VisitorController@receive');
 Route::post('/testvisittime/', 'VisitorController@receiveTime');
@@ -20,5 +21,6 @@ Route::post('/testvisittime/', 'VisitorController@receiveTime');
 Route::get('/visitors/','VisitorController@allVisitorStats');
 Route::get('/','VisitorController@allVisitorStats');
 Route::get('/visitors/{id}','VisitorController@visitorInfo');
+Route::get('/keywords/{name}','KeywordController@keywordInfo');
 Route::get('/visitors/{id}/m/{monthAgo}','VisitorController@visitorInfoByMonthAgo');
 Route::get('/links/{id}','SiteLinkController@linkInfo');

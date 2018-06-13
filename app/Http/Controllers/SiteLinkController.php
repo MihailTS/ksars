@@ -31,7 +31,7 @@ class SiteLinkController extends Controller
         $siteLinkKeywords = [];
         foreach($siteLink->keywords as $keyword){
             $keywordArr = [];
-            $keywordArr["weight"] = $keyword->weight*$keyword->coefficient;
+            $keywordArr["weight"] = $keyword->coefficient;
             $keywordArr["name"] = $keyword->name;
             $keywordArr["ID"] = $keyword->id;
 

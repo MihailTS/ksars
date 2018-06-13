@@ -8,11 +8,12 @@ use App\Services\Contracts\VisitorService;
 use App\Services\Contracts\SiteLinkService;
 use App\SiteLink;
 use App\Visit;
+use App\Keyword;
 use App\Visitor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class VisitorController extends Controller
+class KeywordController extends Controller
 {
     private $visitorService;
     private $siteLinkService;
@@ -27,12 +28,14 @@ class VisitorController extends Controller
         $this->siteLinkService = $siteLinkService;
     }
 
-
+    public function keywordInfo($keywordName){
+        $keywordName = mb_strtolower(trim($keywordName));
+        $keyword = Keyword::where("name",$keywordName)->firstOrFail();
+        $siteLinksWithKeyword=Keyword::join('site_links', 'site_links.id', '=', 'keywords.site_link_id')->where("name",$keywordName)->orderBy("coefficient","desc")->get();
+        return view('keyword',['keywordName'=>$keywordName, 'siteLinksWithKeyword'=>$siteLinksWithKeyword]);
+    }
     public function test(){
         return view('visit');
-    }
-    public function bannerScriptTest(){
-        return view('banner_test');
     }
     public function receive(VisitorReceiveRequest $request){
 
@@ -42,20 +45,7 @@ class VisitorController extends Controller
     public function receiveTime(VisitorReceiveTimeRequest $request){
         $this->visitorService->receiveTimeVisit($request);
     }
-    public function sendInterestsBanner($visitorHash){
-        $visitor = Visitor::where("hash",$visitorHash)->first();
-        $visitorVisitsAndKeywords = $this->visitorService->getVisitsKeywords($visitor);
-        $visitorKeywords=$visitorVisitsAndKeywords->visitorKeywords;
-        $similarLinksData = $this->siteLinkService->findSimilarByKeywords($visitorKeywords);
 
-        $bannerHtml = '<div class="ksars-links-banner">';
-        foreach($similarLinksData as $similarLinkID=>$similarLinkWeight){
-            $siteLink = SiteLink::find($similarLinkID);
-            $bannerHtml .= "<a class='ksars-links-banner__link' href='$siteLink->url'>$siteLink->url</a>";
-        }
-        $bannerHtml .= "</div>";
-        return $bannerHtml;
-    }
 
     public function allVisitorStats(){
         $visitors = Visitor::all();
@@ -63,13 +53,30 @@ class VisitorController extends Controller
     }
 
     public function visitorInfo($visitorID){
-
-
         $visitor = Visitor::findOrFail($visitorID);
-        $visitorVisitsAndKeywords = $this->visitorService->getVisitsKeywords($visitor);
-        $visitorKeywords = $visitorVisitsAndKeywords->visitorKeywords;
-        $visits = $visitorVisitsAndKeywords->visits;
-        $keywords = $visitorVisitsAndKeywords->siteLinkKeywords;
+        $visits = $visitor->visits->where('time_on_page','>',10);
+        $keywords = [];
+        $visitorKeywords = [];
+        foreach($visits as $visit){
+            $vKeywords = $visit->site_link->keywords;
+            if(empty($keywords[$visit->site_link->id])){
+                $keywords[$visit->site_link->id] = $vKeywords->toArray();
+
+                foreach($vKeywords as $vKeyword){
+                    if(!empty($vKeyword)){
+                        $vKeywordKoef = $vKeyword['coefficient'];
+                        if(!empty($visitorKeywords[$vKeyword['name']])){
+                            $visitorKeywords[$vKeyword['name']] += $vKeywordKoef;
+                        }else{
+                            $visitorKeywords[$vKeyword['name']] = $vKeywordKoef;
+                        }
+                    }
+                }
+            }
+        }
+        arsort($visitorKeywords);
+        $visitorKeywords = array_slice($visitorKeywords, 0, SiteLink::TAGS_TO_PARSE_COUNT, true);
+
         $similarLinks = [];
 
         $similarLinksData = $this->siteLinkService->findSimilarByKeywords($visitorKeywords);

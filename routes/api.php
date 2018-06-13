@@ -20,3 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/receive_visitor/', 'VisitorController@receive');
 Route::post('/receive_visit_time/', 'VisitorController@receiveTime');
+Route::get('/send_banner/{visitorHash}', 'VisitorController@sendInterestsBanner');

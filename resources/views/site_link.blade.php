@@ -38,7 +38,7 @@
                 <ul>
 
                     @foreach($siteLinkKeywords as $linkKeyword)
-                        <li>{{$linkKeyword['name']}}: {{$linkKeyword['weight']}}</li>
+                        <li><a href="/keywords/{{$linkKeyword['name']}}">{{$linkKeyword['name']}}: {{$linkKeyword['weight']}}</a></li>
                     @endforeach
                 </ul>
             </div>

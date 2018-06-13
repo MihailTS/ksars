@@ -30,4 +30,7 @@ class SiteLink extends Model
     public function keywords(){
         return $this->hasMany(Keyword::class);
     }
+    public function keywordsByWeight(){
+        return $this->hasMany(Keyword::class)->orderBy('coefficient','desc');
+    }
 }

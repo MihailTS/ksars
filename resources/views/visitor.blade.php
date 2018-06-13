@@ -37,7 +37,7 @@
                 <ul>
 
                     @foreach($visitorKeywords as $visitorKeyword=>$visitorKeywordWeight)
-                        <li>{{$visitorKeyword}}: {{$visitorKeywordWeight}}</li>
+                        <li><a href="/keywords/{{$visitorKeyword}}">{{$visitorKeyword}}: {{$visitorKeywordWeight}}</a></li>
                     @endforeach
                 </ul>
             </div>

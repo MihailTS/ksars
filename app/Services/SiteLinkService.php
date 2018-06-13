@@ -107,7 +107,7 @@ class SiteLinkService implements SiteLinkServiceContract
         if(SiteLinkService::isURLBelongsToSiteDomain($url,$siteUrl)){
             if(
                 $url!='/' &&
-                !preg_match('/^(\'|#|stype|tel|javascript|mailto)/i', $url)
+                !preg_match('/^(\'|#|skype|tel|javascript|mailto)/i', $url)
             ){
                 return $url;
             }
@@ -266,7 +266,7 @@ class SiteLinkService implements SiteLinkServiceContract
         $siteID = $siteLink->site->id;
         $currentLinkID = $siteLink->id;
         $currentKeywords = $siteLink->keywords;
-        $currentKeywordsArray = $siteLink->keywords->pluck('name')->toArray();
+        $currentKeywordsArray = $siteLink->keywords->take(10)->pluck('name')->toArray();
         $keywordsByLink = Keyword::orderBy('site_link_id','asc')->whereIn('name',$currentKeywordsArray)->whereHas(
             'site_link',
             function($query) use ($siteID,$currentLinkID){
